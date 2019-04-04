@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+
+readonly program="$(basename "${0}")"
+
+function usage {
+  echo "
+    Usage:
+      ${program} INPUT
+
+    Description:
+      INPUT should be a series of alphanumeric characters to be
+      converted to NATO phonetic alphabet for easy, clear, and
+      unmistakable communication of letters by voice.
+
+    Options:
+      -h, --help                             Show this help.
+  " | sed -E 's/^ {4}//'
+}
+
+function color_message {
+  local color="${1}"
+  local message="${2}"
+  readonly local all_colors=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
+
+  for i in "${!all_colors[@]}"; do
+    if [[ "${all_colors[${i}]}" == "${color}" ]]; then
+      local color_index="${i}"
+      echo -e "$(tput setaf "${i}")${message}$(tput sgr0)"
+      break
+    fi
+  done
+
+  if [[ -z "${color_index}" ]]; then
+    echo "${FUNCNAME[0]}: '${color}' is not a valid color."
+    exit 1
+  fi
+}
+
+function syntax_error {
+  abort "${program}: ${1}\nTry \`${program} --help\` for more information."
+}
+
+function failure_message {
+  color_message 'red' "${1}" >&2
+}
+
+function abort {
+   failure_message "\n${1}\n"
+   exit 1
+ }
+
+trap 'abort "You aborted."' SIGINT
+
+# Available flags
+args=()
+while [[ "${1}" ]]; do
+  case "${1}" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      args+=("${@}")
+      break
+      ;;
+    -*)
+      syntax_error "unrecognized option: ${1}"
+      ;;
+    *)
+      args+=("${1}")
+      ;;
+  esac
+  shift
+done
+
+set -- "${args[@]}"
+
+# Exit if no argument or more than one argument was given
+if [[ -z "${1}" ]] || [[ "$#" -gt 1 ]]; then
+  usage
+  exit 1
+fi
+
+foo="${1}"
+for (( i=0; i<${#foo}; i++ )); do
+  char=$(echo "${foo:$i:1}" | tr "[:upper:]" "[:lower:]")
+  # echo "$char"
+  case "$char" in
+    a)
+      echo "Alfa          (AL-FAH)"
+      ;;
+    b)
+      echo "Bravo         (BRAH-VOH)"
+      ;;
+    c)
+      echo "Charlie       (CHAR-LEE)"
+      ;;
+    d)
+      echo "Delta         (DELL-TAH)"
+      ;;
+    e)
+      echo "Echo          (ECK-OH)"
+      ;;
+    f)
+      echo "Foxtrot       (FOKS-TROT)"
+      ;;
+    g)
+      echo "Golf          (GOLF)"
+      ;;
+    h)
+      echo "Hotel         (HOH-TEL)"
+      ;;
+    i)
+      echo "India         (IN-DEE-AH)"
+      ;;
+    j)
+      echo "Juliett       (JEW-LEE-ETT)"
+      ;;
+    k)
+      echo "Kilo          (KEY-LOH)"
+      ;;
+    l)
+      echo "Lima          (LEE-MAH)"
+      ;;
+    m)
+      echo "Mike          (MIKE)"
+      ;;
+    n)
+      echo "November      (NO-VEM-BER)"
+      ;;
+    o)
+      echo "Oscar         (OSS-CAH)"
+      ;;
+    p)
+      echo "Papa          (PAH-PAH)"
+      ;;
+    q)
+      echo "Quebec        (KEH-BECK)"
+      ;;
+    r)
+      echo "Romeo         (ROW-ME-OH)"
+      ;;
+    s)
+      echo "Sierra        (SEE-AIR-RAH)"
+      ;;
+    t)
+      echo "Tango         (TANG-GO)"
+      ;;
+    u)
+      echo "Uniform       (YOU-NEE-FORM)"
+      ;;
+    v)
+      echo "Victor        (VIK-TAH)"
+      ;;
+    w)
+      echo "Whiskey       (WISS-KEY)"
+      ;;
+    x)
+      echo "Xray          (ECKS-RAY)"
+      ;;
+    y)
+      echo "Yankee        (YANG-KEY)"
+      ;;
+    z)
+      echo "Zulu          (ZOO-LOO)"
+      ;;
+    1)
+      echo "One           (WUN)"
+      ;;
+    2)
+      echo "Two           (TOO)"
+      ;;
+    3)
+      echo "Three         (TREE)"
+      ;;
+    4)
+      echo "Four          (FOW-ER)"
+      ;;
+    5)
+      echo "Five          (FIFE)"
+      ;;
+    6)
+      echo "Six           (SIX)"
+      ;;
+    7)
+      echo "Seven         (SEV-EN)"
+      ;;
+    8)
+      echo "Eight         (AIT)"
+      ;;
+    9)
+      echo "Niner         (NIN-ER)"
+      ;;
+    0)
+      echo "Zero          (ZEE-RO)"
+      ;;
+  esac
+  # echo $char
+done
